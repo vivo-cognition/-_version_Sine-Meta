@@ -1,25 +1,34 @@
-#include <ostream>
-#include "MyString.h"
-
+#include <iostream>
+#include "ItemManager.h"
+#include <Windows.h>
 int main() {
-	MyString text = "Hello word!";
-	std::cout <<"text = " << text<<std::endl;
+    SetConsoleOutputCP(1251);
+    ItemManager manager("Items.txt");
 
-	MyString text1 = "Hell Maks!";
-	std::cout << "(text1 == text) = "<<(text1 == text) << std::endl;
-	std::cout << "(text == text1) = "<<(text == text1) << std::endl;
-	std::cout <<"(text == Hello word!) = "<< (text == "Hello word!") << std::endl;
+    if (manager.loadItemsFromTXT()) {
+        std::cout << "--- УСПЕХ: Файл загружен успешно! ---" << std::endl;
+    }
+    else {
+        std::cerr << "--- ОШИБКА: Не удалось загрузить файл! ---" << std::endl;
+        return 1; // Завершаем программу с ошибкой
+    }
+  /*  int total = manager.getTotalItemCount();
+    std::cout << "Всего предметов в базе: " << total << std::endl;
 
-	text1 = text;
-	std::cout <<"text1 = " << text1 << std::endl;
-	text1 = "Hi Maks!";
-	std::cout<<"text1 = " << text1 << std::endl;
+    // 4. Печатаем все предметы (если ты реализовала printAllItems)
+    // Это лучший способ увидеть, правильно ли считались имена, описания и статы
+    manager.printAllItems();
 
-	std::cout<<"text1[0] << text1[4] = " << text1[0] << text1[4] << std::endl;
-	std::cout <<"text.size() = " << text.size() << std::endl;
-	std::cout<< " text.c_str() = " << text.c_str() << std::endl;
-	text.clear();
-	std::cout<<"text.clear(); = " << text;
+    // 5. Проверка конкретного слота (например, FEET - индекс 1)
+    const ItemVector& boots = manager.getItemBySlot(FEET);
+    std::cout << "Предметов в слоте FEET: " << boots.getSize() << std::endl;
 
-	return 0;
+    if (boots.getSize() > 0) {
+        std::cout << "Первый предмет в сапогах: " << boots.getAt(0).getName().c_str() << std::endl;
+    }*/
+
+    std::cout << "\nНажмите Enter, чтобы выйти...";
+    std::cin.get();
+
+    return 0;
 }

@@ -1,4 +1,6 @@
 #include "MyString.h"
+#include <cstring>
+#include <iostream>
 
 MyString::MyString():length(0) {
     data = new char[1];

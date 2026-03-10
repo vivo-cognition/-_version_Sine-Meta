@@ -123,18 +123,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Item.cpp" />
+    <ClCompile Include="ItemManager.cpp" />
+    <ClCompile Include="ItemVector.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyString.cpp" />
+    <ClCompile Include="SlotAndVector.cpp" />
+    <ClCompile Include="StatVector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Enum.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemManager.h" />
+    <ClInclude Include="ItemVector.h" />
     <ClInclude Include="Mission.h" />
-    <ClInclude Include="MyMap.h" />
     <ClInclude Include="MyString.h" />
-    <ClInclude Include="MyVector.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="SlotAndVector.h" />
+    <ClInclude Include="StatVector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Items.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
