@@ -9,4 +9,6 @@ struct SlotAndVector {
 
 	SlotAndVector();
 	~SlotAndVector();
+
+	Item& operator[](int index);
 };

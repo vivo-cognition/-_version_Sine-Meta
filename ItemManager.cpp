@@ -1,6 +1,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "ItemManager.h"
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
 
 ItemManager::ItemManager(const MyString& filePath)
 	: itemsFilePath(filePath) {
@@ -59,188 +61,92 @@ bool ItemManager::loadItemsFromTXT() {
 	printf("Успешно загружено %d предметов\n", loadedCount);
 	return true;
 }
-/*
-
-	
-	std::ifstream file(itemsFilePath);
-	if (!file.is_open()) {
-		std::cerr << "ОШИБКА: Файл не открывается'" << itemsFilePath << "'" << std::endl;
-		return false;
-	}
-	try {
-		json j;
-		file >> j;
-
-		if (!j.contains("items") || !j["items"].is_array()) {
-			std::cerr << "ОШИБКА: Некорректная структура JSON файла" << std::endl;
-			return false;
-		}
-
-		//обработка каждого предмета
-		int loadedCount = 0;
-		for (const auto& itemJson : j["items"]) {
-			try {
-				std::string name = itemJson["name"];
-				std::string description = itemJson["description"];
-				std::string slotTypeStr = itemJson["slotType"];
-
-				SlotType slotType = Item::stringToSlotType(slotTypeStr);
-
-				//чтение характеристик
-				std::map<std::string, int> stats;
-				if (itemJson.contains("stats") && itemJson["stats"].is_object()) {
-					for (const auto& [statName, value] : itemJson["stats"].items()) {
-						stats[statName] = value;
-					}
-				}
-
-				//создание предмета и добавления в соответствующую категорию
-				Item newItem(name, description, slotType, stats, false);
-				allItems[slotType].push_back(newItem);
-				loadedCount++;
-			}
-			catch (const json::exception& e) {
-				std::cerr << "Предупреждение: ошибка чтения предмета - " << e.what() << std::endl;
-				continue;
-			}
-		}
-
-		std::cout << "Успешно загружено" << loadedCount << " предметов" << std::endl;
-		return true;
-	}
-	catch (const json::exception& e) {
-		std::cerr << "ОШИБКА парсинга JSON: " << e.what() << std::endl;
-		return false;
-	}
-}
-
-//Получить случайный предмет
-std::vector<Item> ItemManager::getRandomItemChoices(int count,
-	const std::set<SlotType>& excludedSlots) {
-	std::vector<Item> choices;
-	std::vector<SlotType> availableSlots;
-
-	//Собираем доступные слоты
-	for (const auto& [slotType, items] : allItems) {
-		if (excludedSlots.find(slotType) == excludedSlots.end() && !items.empty()) {
-			availableSlots.push_back(slotType);
+ItemVector ItemManager::getRandomItemChoices(int count, const bool* excludedSlots) {
+	ItemVector choices;
+	bool alreadyPickedInThisRoll[7] = { false };
+	int availableSlotsCount = 0;
+	for (int i = 0; i < 7; i++) {
+		if ((excludedSlots == nullptr || !excludedSlots[i]) && allItems[i].items.getSize() > 0) {
+			availableSlotsCount++;
 		}
 	}
-
-	if (availableSlots.empty()) {
-		std::cout << "Нет доступных предметов для выбора" << std::endl;
-		return choices;
+	if (count > availableSlotsCount) {
+		count = availableSlotsCount;
 	}
+	int attempts = 0;
+	while (choices.getSize() < count && attempts < 200) {
+		attempts++;
+		srand(time(NULL));
+		int randomSlotIdx = rand() % 7;
+		bool isExcluded = (excludedSlots != nullptr && excludedSlots[randomSlotIdx]);
+		bool isAlreadyPicked = alreadyPickedInThisRoll[randomSlotIdx];
+		bool isEmpty = (allItems[randomSlotIdx].items.getSize() == 0);
+		if (!isExcluded && !isAlreadyPicked &&! isEmpty) {
+			int itemsInSlot = allItems[randomSlotIdx].items.getSize();
+			int randomItemIdx = rand() % itemsInSlot;
 
-	//Генератор случайных чисел
-	std::random_device rd;
-	std::mt19937 gen(rd());
-
-	//перемешиваем достуупные слоты
-	std::shuffle(availableSlots.begin(), availableSlots.end(), gen);
-	 
-	//Выбор предмета
-	for (int i = 0;i < count && i < availableSlots.size();i++) {
-		SlotType selectedSlot = availableSlots[i];
-
-		if (!allItems[selectedSlot].empty()) {
-			std::uniform_int_distribution<> itemDist(0,
-				allItems[selectedSlot].size() - 1);
-			choices.push_back(allItems[selectedSlot][itemDist(gen)]);
+			Item foundItem = allItems[randomSlotIdx].items.getAt(randomItemIdx);
+			choices.push_back(foundItem);
+			alreadyPickedInThisRoll[randomItemIdx] = true;
 		}
 	}
 	return choices;
 }
-
-//Генерация найденного предмета
 Item ItemManager::generateRandomFoundItem() {
-	std::random_device rd;
-	std::mt19937 gen(rd());
-
-	if (!allItems.empty()) {
-		return Item("Ничего", "Пустой предмет", SlotType::NONE);
-	}
-
-	//выбор случайного слота
-	std::vector<SlotType> allSlotTypes;
-	for (const auto& [slotType, _] : allItems) {
-		if (!allItems[slotType].empty()) {
-			allSlotTypes.push_back(slotType);
-		}
-	}
-
-	if (allSlotTypes.empty()) {
-		return Item();
-	}
-
-	std::uniform_int_distribution<> slotDist(0, allSlotTypes.size() - 1);
-	SlotType randomSlot = allSlotTypes[slotDist(gen)];
-
-	//выбор случайного предмета из этого слота
-	std::uniform_int_distribution<> itemDist(0, allItems[randomSlot].size() - 1);
-
-	Item foundItem = allItems[randomSlot][itemDist(gen)];
-
-	//создание копии с пометкой найденный
-	return Item(foundItem.getName() + "(найденный)",
-		"Вы нашли этот предмет по пути",
-		foundItem.getSlotType(),
-		foundItem.getStats(),
+	int noneIdx = (int)SlotType::NONE;
+	int itemCount = allItems[noneIdx].items.getSize();
+	if (itemCount == 0) return Item();
+	int randomIdx = rand() % itemCount;
+	Item baseItem = allItems[noneIdx].items.getAt(randomIdx);
+	return Item(baseItem.getName(),
+		baseItem.getDescription(),
+		SlotType::NONE,
+		baseItem.getStats(),
 		true);
 }
-
-//Получить все предметы определенного типа
-const std::vector<Item>& ItemManager::getItemsBySlot(SlotType slot) const {
-	static const std::vector<Item> emptyVector;
-	auto it = allItems.find(slot);
-	if (it != allItems.end()) {
-		return it -> second;
+const ItemVector& ItemManager::getItemBySlot(SlotType slot) const {
+	int idx = (int)slot;
+	if (idx < 0 || idx >= 7) {
+		return allItems[0].items;
 	}
-	return emptyVector;
+	return allItems[idx].items;
 }
 
-//Получить все предметы
-const std::map<SlotType, std::vector <Item>>& ItemManager::getAllItems() const {
-	return allItems;
-}
-
-//Вывести все предметы
 void ItemManager::printAllItems() const {
-	if (allItems.empty()) {
+	if (getTotalItemCount() == 0) {
 		std::cout << "Нет загруженных предметов" << std::endl;
 		return;
 	}
-	
-	std::cout << "\n=== ВСЕ ПРЕДМЕТЫ ===" << std::endl;
-	for (const auto& [slotType, items] : allItems) {
-		std::cout << "\n[" << Item::slotTypeToString(slotType)
-			<< "]-" << items.size() << " предметов:" << std::endl;
-
-		for (const auto& item : items) {
-			std::cout << " ~ " << item.getName();
-			std::cout << " - " << item.getDescription() << std::endl;
-
-			//вывод характеристик
-			const auto& stats = item.getStats();
+	std::cout << "\n=== ВСЕ ПРЕДМЕТЫ В БАЗЕ ===" << std::endl;
+	for (int i = 0; i < 7; i++) {
+		const ItemVector& currentItems = allItems[i].items;
+		if (currentItems.getSize() == 0) continue;
+		std::cout << "\n[" << Item::SlotTypeToMyString((SlotType)i).c_str()
+			<< "] - " << currentItems.getSize() << " предметов:" << std::endl;
+		for (int j = 0; j < currentItems.getSize(); j++) {
+			const Item& item = currentItems.getAt(j);
+			std::cout << " ~ " << item.getName().c_str();
+			std::cout << " - " << item.getDescription().c_str() << std::endl;
+			const StatVector& stats = item.getStats();
 			if (!stats.empty()) {
-				std::cout << "Характеристики: ";
-				for (const auto& [stat, value] : stats) {
-					std::cout << stat << ": " << value<<" ";
-				}		
-				std::cout << std::endl;		
-			}		
+				std::cout << "   Характеристики: ";
+				for (int k = 0; k < stats.size; k++) {
+					StatPair pair = stats.getAt(k);
+					std::cout << pair.key.c_str() << ": " << pair.value << "  ";
+				}
+				std::cout << std::endl;
+			}
 		}
 	}
-	std::cout << "===============\n" << std::endl;
-}	
-
-//получить общее количество предметов
+	std::cout << "\n===========================\n" << std::endl;
+}
 int ItemManager::getTotalItemCount() const {
-		int count = 0;
-		for (const auto& [_, items] : allItems) {
-			count += items.size();
-		}
-		return count;
+	int total = 0;
+	for (int i = 0; i < 7; i++) {
+		total += allItems[i].items.getSize();
 	}
-
-	//здесь будет крутая программа*/
+	return total;
+}
+bool ItemManager::isLoaded() const {
+	return getTotalItemCount() > 0;
+}

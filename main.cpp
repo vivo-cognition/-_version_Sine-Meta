@@ -1,6 +1,7 @@
 #include <iostream>
 #include "ItemManager.h"
 #include <Windows.h>
+#include "Enum.h"
 int main() {
     SetConsoleOutputCP(1251);
     ItemManager manager("Items.txt");
@@ -10,23 +11,16 @@ int main() {
     }
     else {
         std::cerr << "--- ОШИБКА: Не удалось загрузить файл! ---" << std::endl;
-        return 1; // Завершаем программу с ошибкой
+        return 1;
     }
-  /*  int total = manager.getTotalItemCount();
+    int total = manager.getTotalItemCount();
     std::cout << "Всего предметов в базе: " << total << std::endl;
-
-    // 4. Печатаем все предметы (если ты реализовала printAllItems)
-    // Это лучший способ увидеть, правильно ли считались имена, описания и статы
     manager.printAllItems();
-
-    // 5. Проверка конкретного слота (например, FEET - индекс 1)
-    const ItemVector& boots = manager.getItemBySlot(FEET);
+    const ItemVector& boots = manager.getItemBySlot(SlotType::FEET);
     std::cout << "Предметов в слоте FEET: " << boots.getSize() << std::endl;
-
     if (boots.getSize() > 0) {
         std::cout << "Первый предмет в сапогах: " << boots.getAt(0).getName().c_str() << std::endl;
-    }*/
-
+    }
     std::cout << "\nНажмите Enter, чтобы выйти...";
     std::cin.get();
 
