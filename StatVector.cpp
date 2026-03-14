@@ -70,3 +70,20 @@ StatVector& StatVector::operator=(const StatVector& other) {
     else { data = nullptr; }
     return *this;
 }
+void StatVector::addOrUpdate(const MyString& key, int value) {
+    for (int i = 0; i < size; i++) {
+        if (data[i].key == key) {
+            data[i].value += value;
+            return;
+        }
+    }
+    StatPair* newData = new StatPair[size + 1];
+    for (int i = 0; i < size; i++) {
+        newData[i] = data[i];
+    }
+    newData[size].key = key;
+    newData[size].value = value;
+    delete[] data;
+    data = newData;
+    size++;
+}

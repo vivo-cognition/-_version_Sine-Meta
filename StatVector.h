@@ -23,6 +23,7 @@ struct StatVector {
     void setAt(int index, const MyString& key, int value);
     bool empty() const;
 
+    void addOrUpdate(const MyString& key, int value);
     StatVector& operator=(const StatVector& other);
 };
 #endif

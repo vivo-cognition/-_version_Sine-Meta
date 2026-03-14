@@ -94,16 +94,15 @@ ItemVector ItemManager::getRandomItemChoices(int count, const bool* excludedSlot
 }
 Item ItemManager::generateRandomFoundItem() {
 	int noneIdx = (int)SlotType::NONE;
-	int itemCount = allItems[noneIdx].items.getSize();
-	if (itemCount == 0) return Item();
-	int randomIdx = rand() % itemCount;
+	int count = allItems[noneIdx].items.getSize();
+	if (count <= 0) {
+		return Item("Ничего", "Вы обыскали всё, но ничего не нашли", SlotType::NONE);
+	}
+	int randomIdx = rand() % count;
 	Item baseItem = allItems[noneIdx].items.getAt(randomIdx);
-	return Item(baseItem.getName(),
-		baseItem.getDescription(),
-		SlotType::NONE,
-		baseItem.getStats(),
-		true);
+	return Item(baseItem.getName(), baseItem.getDescription(), SlotType::NONE, baseItem.getStats(), true);
 }
+
 const ItemVector& ItemManager::getItemBySlot(SlotType slot) const {
 	int idx = (int)slot;
 	if (idx < 0 || idx >= 7) {

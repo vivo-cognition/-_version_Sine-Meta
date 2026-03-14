@@ -1,28 +1,32 @@
 #include <iostream>
-#include "ItemManager.h"
 #include <Windows.h>
-#include "Enum.h"
-int main() {
-    SetConsoleOutputCP(1251);
-    ItemManager manager("Items.txt");
+#include "ItemManager.h"
+#include "Player.h"
+#include <ctime> 
 
-    if (manager.loadItemsFromTXT()) {
-        std::cout << "--- УСПЕХ: Файл загружен успешно! ---" << std::endl;
-    }
-    else {
-        std::cerr << "--- ОШИБКА: Не удалось загрузить файл! ---" << std::endl;
+int main() {
+    srand(static_cast<unsigned int>(time(0)));
+    SetConsoleOutputCP(1251);
+    SetConsoleCP(1251);
+
+    ItemManager manager("Items.txt");
+    if (!manager.loadItemsFromTXT()) {
+        std::cout << "Критическая ошибка: файл Items.txt не найден!" << std::endl;
+        system("pause");
         return 1;
     }
-    int total = manager.getTotalItemCount();
-    std::cout << "Всего предметов в базе: " << total << std::endl;
-    manager.printAllItems();
-    const ItemVector& boots = manager.getItemBySlot(SlotType::FEET);
-    std::cout << "Предметов в слоте FEET: " << boots.getSize() << std::endl;
-    if (boots.getSize() > 0) {
-        std::cout << "Первый предмет в сапогах: " << boots.getAt(0).getName().c_str() << std::endl;
-    }
-    std::cout << "\nНажмите Enter, чтобы выйти...";
-    std::cin.get();
+    Player igrok("Странник");
+    std::cout << "--- Добро пожаловать в игру! ---" << std::endl;
+    Item randomItem = manager.generateRandomFoundItem();
+    std::cout << "Вы нашли: " << randomItem.getName().c_str()<< std::endl<< randomItem.getDescription() <<std::endl;
+    igrok.equipItem(randomItem);
+    igrok.printStatus();
 
+    randomItem = manager.generateRandomFoundItem();
+    std::cout << "Вы нашли: " << randomItem.getName().c_str() << std::endl << randomItem.getDescription() << std::endl;
+    igrok.equipItem(randomItem);
+    igrok.printStatus();
+    std::cout << "Нажмите Enter для завершения...";
+    std::cin.get();
     return 0;
 }
