@@ -63,11 +63,9 @@ StatVector& StatVector::operator=(const StatVector& other) {
         size = other.size;
         data = new StatPair[size];
         for (int i = 0; i < size; i++) {
-            data[i].key = other.data[i].key;
-            data[i].value = other.data[i].value;
+            data[i] = other.data[i];
         }
     }
-    else { data = nullptr; }
     return *this;
 }
 void StatVector::addOrUpdate(const MyString& key, int value) {

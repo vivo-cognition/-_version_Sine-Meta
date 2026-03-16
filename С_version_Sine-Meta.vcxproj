@@ -125,7 +125,8 @@
   <ItemGroup>
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="ItemManager.cpp" />
-    <ClCompile Include="ItemVector.cpp" />
+    <ClCompile Include="Location.cpp" />
+    <ClCompile Include="LocationManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyString.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -136,15 +137,18 @@
     <ClInclude Include="Enum.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemManager.h" />
-    <ClInclude Include="ItemVector.h" />
+    <ClInclude Include="Location.h" />
+    <ClInclude Include="LocationManager.h" />
     <ClInclude Include="Mission.h" />
     <ClInclude Include="MyString.h" />
+    <ClInclude Include="MyVector.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SlotAndVector.h" />
     <ClInclude Include="StatVector.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Items.txt" />
+    <Text Include="Locations.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

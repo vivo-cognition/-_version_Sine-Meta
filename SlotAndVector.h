@@ -1,11 +1,12 @@
 #pragma once
 #include <iostream>
 #include "Enum.h"
-#include "ItemVector.h"
+#include "MyVector.h"
+#include "Item.h"
 
 struct SlotAndVector {
 	SlotType slot;
-	ItemVector items;
+	MyVector<Item> items;
 
 	SlotAndVector();
 	~SlotAndVector();

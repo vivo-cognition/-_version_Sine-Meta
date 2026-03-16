@@ -3,17 +3,19 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <cstring>
 
 ItemManager::ItemManager(const MyString& filePath)
 	: itemsFilePath(filePath) {
 	loadItemsFromTXT();
 }
+
 bool ItemManager::loadItemsFromTXT() {
 	for (int i = 0; i < 7; i++) {
 		allItems[i].items.clear();
 		allItems[i].slot = (SlotType)i;
 	}
-	std::cout << "Загрузка предметов из файла: " << itemsFilePath << std::endl;
+	std::cout << "Загрузка предметов из файла: " << itemsFilePath.c_str() << std::endl;
 	FILE* file = fopen(itemsFilePath.c_str(), "r");
 	if (!file) {
 		printf("ОШИБКА: Файл %s не найден\n", itemsFilePath.c_str());
@@ -24,31 +26,30 @@ bool ItemManager::loadItemsFromTXT() {
 	while (fgets(line, sizeof(line), file)) {
 		char slotName[50];
 		int itemsInSlot = 0;
-		if (sscanf(line, "%s %d {", slotName, &itemsInSlot) == 2) {
+		if (sscanf(line, "%s %d", slotName, &itemsInSlot) >= 2) {
 			SlotType currentSlot = Item::MyStringToSlotType(slotName);
 
 			for (int i = 0; i < itemsInSlot; i++) {
 				fgets(line, sizeof(line), file);
 
-				fgets(line, sizeof(line), file);
-				line[strcspn(line, "\n")] = 0;
+				if (!fgets(line, sizeof(line), file)) break;
+				line[strcspn(line, "\r\n")] = 0;
 				MyString itemName = line;
 
-				fgets(line, sizeof(line), file);
-				line[strcspn(line, "\n")] = 0;
+				if (!fgets(line, sizeof(line), file)) break;
+				line[strcspn(line, "\r\n")] = 0;
 				MyString itemDesc = line;
 
-				int statsCount = 0;
-				fgets(line, sizeof(line), file);
-				statsCount = atoi(line);
+				if (!fgets(line, sizeof(line), file)) break;
+				int statsCount = atoi(line);
 
 				StatVector itemStats(statsCount);
-
 				for (int j = 0; j < statsCount; j++) {
 					char statName[50];
 					int statValue;
-					fscanf(file, "%s %d\n", statName, &statValue);
-					itemStats.setAt(j, MyString(statName), statValue);
+					if (fscanf(file, "%s %d\n", statName, &statValue) == 2) {
+						itemStats.setAt(j, MyString(statName), statValue);
+					}
 				}
 
 				Item newItem(itemName, itemDesc, currentSlot, itemStats, false);
@@ -61,8 +62,9 @@ bool ItemManager::loadItemsFromTXT() {
 	printf("Успешно загружено %d предметов\n", loadedCount);
 	return true;
 }
-ItemVector ItemManager::getRandomItemChoices(int count, const bool* excludedSlots) {
-	ItemVector choices;
+
+MyVector<Item> ItemManager::getRandomItemChoices(int count, const bool* excludedSlots) {
+	MyVector<Item> choices;
 	bool alreadyPickedInThisRoll[7] = { false };
 	int availableSlotsCount = 0;
 	for (int i = 0; i < 7; i++) {
@@ -76,7 +78,6 @@ ItemVector ItemManager::getRandomItemChoices(int count, const bool* excludedSlot
 	int attempts = 0;
 	while (choices.getSize() < count && attempts < 200) {
 		attempts++;
-		srand(time(NULL));
 		int randomSlotIdx = rand() % 7;
 		bool isExcluded = (excludedSlots != nullptr && excludedSlots[randomSlotIdx]);
 		bool isAlreadyPicked = alreadyPickedInThisRoll[randomSlotIdx];
@@ -87,11 +88,12 @@ ItemVector ItemManager::getRandomItemChoices(int count, const bool* excludedSlot
 
 			Item foundItem = allItems[randomSlotIdx].items.getAt(randomItemIdx);
 			choices.push_back(foundItem);
-			alreadyPickedInThisRoll[randomItemIdx] = true;
+			alreadyPickedInThisRoll[randomSlotIdx] = true;
 		}
 	}
 	return choices;
 }
+
 Item ItemManager::generateRandomFoundItem() {
 	int noneIdx = (int)SlotType::NONE;
 	int count = allItems[noneIdx].items.getSize();
@@ -103,7 +105,7 @@ Item ItemManager::generateRandomFoundItem() {
 	return Item(baseItem.getName(), baseItem.getDescription(), SlotType::NONE, baseItem.getStats(), true);
 }
 
-const ItemVector& ItemManager::getItemBySlot(SlotType slot) const {
+const MyVector<Item>& ItemManager::getItemBySlot(SlotType slot) const {
 	int idx = (int)slot;
 	if (idx < 0 || idx >= 7) {
 		return allItems[0].items;
@@ -118,7 +120,7 @@ void ItemManager::printAllItems() const {
 	}
 	std::cout << "\n=== ВСЕ ПРЕДМЕТЫ В БАЗЕ ===" << std::endl;
 	for (int i = 0; i < 7; i++) {
-		const ItemVector& currentItems = allItems[i].items;
+		const MyVector<Item>& currentItems = allItems[i].items;
 		if (currentItems.getSize() == 0) continue;
 		std::cout << "\n[" << Item::SlotTypeToMyString((SlotType)i).c_str()
 			<< "] - " << currentItems.getSize() << " предметов:" << std::endl;
@@ -139,6 +141,7 @@ void ItemManager::printAllItems() const {
 	}
 	std::cout << "\n===========================\n" << std::endl;
 }
+
 int ItemManager::getTotalItemCount() const {
 	int total = 0;
 	for (int i = 0; i < 7; i++) {
@@ -146,6 +149,7 @@ int ItemManager::getTotalItemCount() const {
 	}
 	return total;
 }
+
 bool ItemManager::isLoaded() const {
 	return getTotalItemCount() > 0;
 }

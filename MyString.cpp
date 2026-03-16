@@ -2,6 +2,7 @@
 #include <cstring>
 #include <iostream>
 
+
 MyString::MyString():length(0) {
     data = new char[1];
     data[0] = '\0';
@@ -36,7 +37,6 @@ MyString::~MyString() {
     delete[] data;
 }
 
-//операторы
 MyString& MyString::operator=(const MyString& other) {
     if (this != &other) {
         delete[] data;
@@ -64,7 +64,22 @@ char& MyString::operator[](int index) {
 const char& MyString::operator[](int index) const {
     return data[index];
 }
-//функции
+MyString& MyString::operator+=(char c) {
+    int newLength = length + 1;
+    char* newData = new char[newLength + 1];
+    if (data != nullptr) {
+        for (int i = 0; i < length; i++) {
+            newData[i] = data[i];
+        }
+        delete[] data;
+    }
+    newData[length] = c;
+    newData[newLength] = '\0';
+    data = newData;
+    length = newLength;
+    return *this;
+}
+
 const char* MyString::c_str() const {
     return data;
 }

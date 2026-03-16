@@ -1,7 +1,4 @@
 #pragma once
-#ifndef MYSTRING_H
-#define MYSTRING_H
-
 #include <iostream>
 
 struct MyString {
@@ -19,6 +16,7 @@ struct MyString {
     bool operator==(const char* other) const;
     char& operator[](int index);
     const char& operator[](int index) const;
+    MyString& operator+=(char c);
 
     const char* c_str() const;
     int size() const;
@@ -27,7 +25,3 @@ struct MyString {
 
     friend std::ostream& operator<<(std::ostream& os, const MyString& str);
 };
-
-
-
-#endif

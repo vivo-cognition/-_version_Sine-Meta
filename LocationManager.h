@@ -1,0 +1,19 @@
+#pragma once
+#include "MyVector.h"
+#include "Location.h"
+
+struct LocationManager {
+	MyVector<Location> allLocations;
+	MyString locationsFilePath;
+	LocationManager(const MyString& filePath = "Locations.txt");
+	bool loadLocationsFromTxt();
+	//Location getRandomLocation();
+
+	bool isLoaded() const;
+	const MyVector<Location>& getAllLocations() const;
+	void printAllLocations() const;
+
+	int getTotalCount() const;
+
+};
+

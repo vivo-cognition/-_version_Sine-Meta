@@ -3,6 +3,7 @@
 #include "ItemManager.h"
 #include "Player.h"
 #include <ctime> 
+#include "LocationManager.h"
 
 int main() {
     srand(static_cast<unsigned int>(time(0)));
@@ -10,7 +11,7 @@ int main() {
     SetConsoleCP(1251);
 
     ItemManager manager("Items.txt");
-    if (!manager.loadItemsFromTXT()) {
+    if (!manager.isLoaded()) {
         std::cout << "Критическая ошибка: файл Items.txt не найден!" << std::endl;
         system("pause");
         return 1;
@@ -26,6 +27,8 @@ int main() {
     std::cout << "Вы нашли: " << randomItem.getName().c_str() << std::endl << randomItem.getDescription() << std::endl;
     igrok.equipItem(randomItem);
     igrok.printStatus();
+    LocationManager manager1("Locations.txt");
+    manager1.printAllLocations();
     std::cout << "Нажмите Enter для завершения...";
     std::cin.get();
     return 0;

@@ -1,9 +1,6 @@
 #pragma once
 
-#ifndef ENUMS_H
-#define ENUMS_H
-
-enum class SlotType {
+enum SlotType {
 	HEAD=0,
 	BODY=1,
 	HANDS=2,
@@ -12,6 +9,3 @@ enum class SlotType {
 	SPECIAL=5,
 	NONE=6
 };
-
-#endif
-

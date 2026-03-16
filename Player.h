@@ -1,13 +1,13 @@
 #pragma once
-#include "ItemVector.h"
 #include "StatVector.h"
 #include "MyString.h"
 #include "Item.h"
+#include "MyVector.h"
 
 class Player {
 private:
     MyString name;
-    ItemVector inventory;
+    MyVector<Item> inventory;
     StatVector totalStats;
 
 public:
