@@ -7,12 +7,11 @@ struct LocationManager {
 	MyString locationsFilePath;
 	LocationManager(const MyString& filePath = "Locations.txt");
 	bool loadLocationsFromTxt();
-	//Location getRandomLocation();
-
+   
 	bool isLoaded() const;
 	const MyVector<Location>& getAllLocations() const;
 	void printAllLocations() const;
-
+    Location getRandomLocation();
 	int getTotalCount() const;
 
 };

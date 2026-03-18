@@ -97,13 +97,25 @@ MyVector<Item> ItemManager::getRandomItemChoices(int count, const bool* excluded
 Item ItemManager::generateRandomFoundItem() {
 	int noneIdx = (int)SlotType::NONE;
 	int count = allItems[noneIdx].items.getSize();
+
 	if (count <= 0) {
 		return Item("Ничего", "Вы обыскали всё, но ничего не нашли", SlotType::NONE);
 	}
-	int randomIdx = rand() % count;
-	Item baseItem = allItems[noneIdx].items.getAt(randomIdx);
-	return Item(baseItem.getName(), baseItem.getDescription(), SlotType::NONE, baseItem.getStats(), true);
+
+	int attempts = count * 2;
+	while (attempts > 0) {
+		int randomIdx = rand() % count;
+		Item& baseItem = allItems[noneIdx].items.getAt(randomIdx);
+
+		if (!baseItem.isFound()) {
+			baseItem.isFoundItem=true;
+			return Item(baseItem.getName(), baseItem.getDescription(), SlotType::NONE, baseItem.getStats(), true);
+		}	
+		attempts--;
+	}
+	return Item("Ничего", "Вы обыскали всё, но ничего не нашли", SlotType::NONE);
 }
+
 
 const MyVector<Item>& ItemManager::getItemBySlot(SlotType slot) const {
 	int idx = (int)slot;

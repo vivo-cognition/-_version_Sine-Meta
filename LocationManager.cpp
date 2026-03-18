@@ -74,7 +74,6 @@ int LocationManager::getTotalCount() const {
 }
 
 void LocationManager::printAllLocations() const {
-    // Если используете подсчет через метод или размер вектора
     if (allLocations.getSize() == 0) {
         std::cout << "Нет загруженных локаций" << std::endl;
         return;
@@ -88,7 +87,6 @@ void LocationManager::printAllLocations() const {
         std::cout << "\n[" << i + 1 << "] Локация: " << loc.name.c_str() << std::endl;
         std::cout << "    " << loc.description.c_str() << std::endl;
 
-        // Вывод требований (requirements)
         const StatVector& reqs = loc.requirements;
         if (reqs.size > 0) {
             std::cout << "    Требования: ";
@@ -99,10 +97,18 @@ void LocationManager::printAllLocations() const {
             std::cout << std::endl;
         }
 
-        // Краткий предпросмотр итогов (опционально)
         std::cout << "    Успех: " << loc.successText.c_str() << std::endl;
         std::cout << "    Провал: " << loc.failText.c_str() << std::endl;
     }
 
     std::cout << "\n================================" << std::endl;
+}
+Location LocationManager::getRandomLocation() {
+    int count = allLocations.getSize();
+    if (count <= 0) {
+        return Location();
+    }
+    int randomIdx = rand() % count;
+    Location baseLocation = allLocations.getAt(randomIdx);
+    return baseLocation;
 }

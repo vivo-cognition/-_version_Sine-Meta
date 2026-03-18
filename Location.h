@@ -16,6 +16,8 @@ struct Location {
         const StatVector& initialStats = StatVector(0),
         const MyString& s = "Ничего",
         const MyString& f = "Нет описания");
+    MyString getName() const;
+    MyString getDescription() const;
 
-    bool checkVictory(const Player&, const Location&);
+    bool checkVictory(const Player&);
 };
