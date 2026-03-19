@@ -3,21 +3,17 @@
 #include "Player.h"
 #include "MyString.h"
 #include "StatVector.h"
+#include "path.h"
+#include "MyVector.h"
 
 struct Location {
     MyString name;
     MyString description;
-    StatVector requirements;
-    MyString successText;
-    MyString failText;
+    MyVector<Path> paths;
 
-    Location(const MyString& n = "Ничего",
-        const MyString& desc = "Нет описания",
-        const StatVector& initialStats = StatVector(0),
-        const MyString& s = "Ничего",
-        const MyString& f = "Нет описания");
+    Location(const MyString& n = "Пусто", const MyString& desc = "Нет описания");
     MyString getName() const;
     MyString getDescription() const;
 
-    bool checkVictory(const Player&);
+    bool checkPath(const Player& player, int pathIdx);
 };

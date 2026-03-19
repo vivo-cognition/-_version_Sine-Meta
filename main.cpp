@@ -31,8 +31,7 @@ int main() {
     manager1.printAllLocations();
     Location randomLocation = manager1.getRandomLocation();
     std::cout << "\nРандомная локации " << randomLocation.getName() << std::endl << randomLocation.getDescription() << std::endl;
-    MyString rez = (randomLocation.checkVictory(igrok)) ? randomLocation.successText : randomLocation.failText;
-        std::cout << rez;
+    
     std::cout << "Нажмите Enter для завершения...";
     std::cin.get();
     return 0;

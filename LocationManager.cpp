@@ -12,16 +12,10 @@ LocationManager::LocationManager(const MyString& filePath)
 
 bool LocationManager::loadLocationsFromTxt() {
     allLocations.clear();
-
-    std::cout << "Загрузка локаций из файла: " << locationsFilePath.c_str() << std::endl;
     FILE* file = fopen(locationsFilePath.c_str(), "r");
-    if (!file) {
-        printf("ОШИБКА: Файл %s не найден\n", locationsFilePath.c_str());
-        return false;
-    }
+    if (!file) return false;
 
     char line[1024];
-    int loadedCount = 0;
     while (fgets(line, sizeof(line), file)) {
         char locName[64];
         if (sscanf(line, "%s {", locName) == 1) {
@@ -32,38 +26,51 @@ bool LocationManager::loadLocationsFromTxt() {
                 newLoc.description = MyString(line);
             }
             if (fgets(line, sizeof(line), file)) {
-                int statsCount = atoi(line);
-                StatVector locationStats(statsCount);
-                for (int i = 0; i < statsCount; i++) {
-                    if (fgets(line, sizeof(line), file)) {
-                        char sName[64];
-                        int sVal;
-                        if (sscanf(line, "%s %d", sName, &sVal) == 2) {
-                            locationStats.setAt(i, MyString(sName), sVal);
+                int pathsCount = atoi(line);
+                for (int p = 0; p < pathsCount; p++) {
+                    Path newPath;
+                    fgets(line, sizeof(line), file);
+                    line[strcspn(line, "\r\n")] = 0;
+                    newPath.actionName = MyString(line);
+
+                    fgets(line, sizeof(line), file);
+                    int reqCount = atoi(line);
+                    newPath.requirements = StatVector(reqCount);
+                    for (int i = 0; i < reqCount; i++) {
+                        char sName[64]; int sVal;
+                        fgets(line, sizeof(line), file);
+                        sscanf(line, "%s %d", sName, &sVal);
+                        newPath.requirements.setAt(i, MyString(sName), sVal);
+                    }
+                    fgets(line, sizeof(line), file);
+                    int rewardsCount = atoi(line);
+                    newPath.rewards = StatVector(rewardsCount);
+                    for (int i = 0; i < rewardsCount; i++) {
+                        char rName[64]; int rVal;
+                        fgets(line, sizeof(line), file);
+                        if (sscanf(line, "%s %d", rName, &rVal) == 2) {
+                            newPath.rewards.setAt(i, MyString(rName), rVal);
                         }
                     }
+                    fgets(line, sizeof(line), file);
+                    line[strcspn(line, "\r\n")] = 0;
+                    newPath.successText = MyString(line);
+
+                    fgets(line, sizeof(line), file);
+                    line[strcspn(line, "\r\n")] = 0;
+                    newPath.failText = MyString(line);
+
+                    newLoc.paths.push_back(newPath);
                 }
-                newLoc.requirements = locationStats;
-            }
-            if (fgets(line, sizeof(line), file)) {
-                line[strcspn(line, "\r\n")] = 0;
-                newLoc.successText = MyString(line);
-            }
-            if (fgets(line, sizeof(line), file)) {
-                line[strcspn(line, "\r\n")] = 0;
-                newLoc.failText = MyString(line);
             }
             fgets(line, sizeof(line), file);
-
             allLocations.push_back(newLoc);
-            loadedCount++;
         }
     }
-
     fclose(file);
-    printf("Успешно загружено %d локаций\n", loadedCount);
     return true;
 }
+
 
 const MyVector<Location>& LocationManager::getAllLocations() const {
     return allLocations;
@@ -87,22 +94,34 @@ void LocationManager::printAllLocations() const {
         std::cout << "\n[" << i + 1 << "] Локация: " << loc.name.c_str() << std::endl;
         std::cout << "    " << loc.description.c_str() << std::endl;
 
-        const StatVector& reqs = loc.requirements;
-        if (reqs.size > 0) {
-            std::cout << "    Требования: ";
-            for (int k = 0; k < reqs.size; k++) {
-                StatPair pair = reqs.getAt(k);
-                std::cout << pair.key.c_str() << " >= " << pair.value << "  ";
+        for (int j = 0; j < loc.paths.getSize(); j++) {
+            const Path& path = loc.paths.getAt(j);
+            std::cout << "\n    Путь №" << j + 1 << ": " << path.actionName.c_str();
+            if (path.rewards.size > 0) {
+                std::cout << "\n    Награда: ";
+                for (int k = 0; k < path.rewards.size; k++) {
+                    StatPair pair = path.rewards.getAt(k);
+                    std::cout << "+" << pair.value << " " << pair.key.c_str() << "  ";
+                }
             }
-            std::cout << std::endl;
+            if (path.requirements.size > 0) {
+                std::cout << "\n    Требования: ";
+                for (int k = 0; k < path.requirements.size; k++) {
+                    StatPair pair = path.requirements.getAt(k);
+                    std::cout << pair.key.c_str() << " >= " << pair.value << " ";
+                }
+            }
+            else {
+                std::cout << "\n    Требования: отсутствуют";
+            }
+
+            std::cout << "\n    Результат успеха: " << path.successText.c_str();
+            std::cout << "\n    Результат провала: " << path.failText.c_str() << std::endl;
         }
-
-        std::cout << "    Успех: " << loc.successText.c_str() << std::endl;
-        std::cout << "    Провал: " << loc.failText.c_str() << std::endl;
     }
-
     std::cout << "\n================================" << std::endl;
 }
+
 Location LocationManager::getRandomLocation() {
     int count = allLocations.getSize();
     if (count <= 0) {

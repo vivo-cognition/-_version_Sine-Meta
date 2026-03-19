@@ -1,18 +1,23 @@
 #include "Location.h"
 
-Location::Location(const MyString& n, const MyString& desc, const StatVector& req, const MyString& success, const MyString& fail)
-    : name(n), description(desc), requirements(req), successText(success), failText(fail) {}
+Location::Location(const MyString& n, const MyString& desc)
+    : name(n), description(desc) {
+}
 
-bool Location::checkVictory(const Player& player) {
-    for (int i = 0; i < requirements.size; i++) {
-        StatPair req = requirements.getAt(i);
-        int playerStat = player.getStatValue(req.key);
-        if (playerStat < req.value) {
+bool Location::checkPath(const Player& player, int pathIdx) {
+    if (pathIdx < 0 || pathIdx >= paths.getSize()) {
+        return false;
+    }
+    const Path& p = paths.getAt(pathIdx);
+    for (int i = 0; i < p.requirements.size; i++) {
+        StatPair req = p.requirements.getAt(i);
+        if (player.getStatValue(req.key) < req.value) {
             return false;
         }
     }
     return true;
 }
+
 MyString Location::getName() const {
     return name;
 }

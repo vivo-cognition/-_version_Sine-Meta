@@ -13,8 +13,8 @@ struct StatPair {
 struct StatVector {
     StatPair* data;
     int size;
-
-    StatVector(int count);
+    
+    StatVector(int count=0);
     StatVector(const StatVector& other);
     ~StatVector();
 
