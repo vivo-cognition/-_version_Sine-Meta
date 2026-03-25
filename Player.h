@@ -16,4 +16,5 @@ public:
     void equipItem(const Item& item);
     int getStatValue(const MyString& statName) const;
     void printStatus() const;
+    void applyStatChange(const StatVector& rewards);
 };

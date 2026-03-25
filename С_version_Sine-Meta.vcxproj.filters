@@ -42,6 +42,9 @@
     <ClCompile Include="LocationManager.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyString.h">
@@ -80,9 +83,13 @@
     <ClInclude Include="Path.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Items.txt" />
     <Text Include="Locations.txt" />
+    <Text Include="Events.txt" />
   </ItemGroup>
 </Project>

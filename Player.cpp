@@ -33,3 +33,9 @@ void Player::printStatus() const {
     }
     std::cout << "\n============================\n";
 }
+void Player::applyStatChange(const StatVector& rewards) {
+    for (int i = 0; i < rewards.size; i++) {
+        StatPair reward = rewards.getAt(i);
+        totalStats.addOrUpdate(reward.key, reward.value);
+    }
+}

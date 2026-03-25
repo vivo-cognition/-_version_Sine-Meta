@@ -123,6 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="ItemManager.cpp" />
     <ClCompile Include="Location.cpp" />
@@ -135,6 +136,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Enum.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemManager.h" />
     <ClInclude Include="Location.h" />
@@ -148,6 +150,7 @@
     <ClInclude Include="StatVector.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="Events.txt" />
     <Text Include="Items.txt" />
     <Text Include="Locations.txt" />
   </ItemGroup>
