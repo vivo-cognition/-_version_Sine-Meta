@@ -5,10 +5,11 @@
 #include <cstdlib>
 #include <cstring>
 
-LocationManager::LocationManager(const MyString& locPath, const MyString& eventPath)
-    : locationsFilePath(locPath), eventsFilePath(eventPath) {
+LocationManager::LocationManager(const MyString& locPath, const MyString& eventPath, const MyString& kinFinal)
+    : locationsFilePath(locPath), eventsFilePath(eventPath), kingFilePath(kinFinal) {
     loadLocationsFromTxt();
     loadEventsFromTxt();
+    loadKingFinalFromTxt();
 }
 
 bool LocationManager::loadLocationsFromTxt() {
@@ -200,4 +201,59 @@ Location LocationManager::getRandomEventByType(const MyString& type) {
     if (filteredEvents.getSize() == 0) return Location();
     int randomIdx = rand() % filteredEvents.getSize();
     return filteredEvents.getAt(randomIdx);
+}
+bool LocationManager::loadKingFinalFromTxt() {
+    FILE* file = fopen(kingFilePath.c_str(), "r");
+    if (!file) return false;
+
+    char line[1024];
+    while (fgets(line, sizeof(line), file)) {
+        char locName[64];
+        if (sscanf(line, "%s {", locName) == 1) {
+            kingFinal.name = MyString(locName);
+            if (fgets(line, sizeof(line), file)) {
+                line[strcspn(line, "\r\n")] = 0;
+                kingFinal.description = MyString(line);
+            }
+            if (fgets(line, sizeof(line), file)) {
+                int pathsCount = atoi(line);
+                for (int p = 0; p < pathsCount; p++) {
+                    Path newPath;
+                    fgets(line, sizeof(line), file);
+                    line[strcspn(line, "\r\n")] = 0;
+                    newPath.actionName = MyString(line);
+                    fgets(line, sizeof(line), file);
+                    int reqCount = atoi(line);
+                    newPath.requirements = StatVector(reqCount);
+                    for (int i = 0; i < reqCount; i++) {
+                        char sName[64]; int sVal;
+                        fgets(line, sizeof(line), file);
+                        sscanf(line, "%s %d", sName, &sVal);
+                        newPath.requirements.setAt(i, MyString(sName), sVal);
+                    }
+                    fgets(line, sizeof(line), file);
+                    int rewardsCount = atoi(line);
+                    newPath.rewards = StatVector(rewardsCount);
+                    for (int i = 0; i < rewardsCount; i++) {
+                        char rName[64]; int rVal;
+                        fgets(line, sizeof(line), file);
+                        sscanf(line, "%s %d", rName, &rVal);
+                        newPath.rewards.setAt(i, MyString(rName), rVal);
+                    }
+                    fgets(line, sizeof(line), file);
+                    line[strcspn(line, "\r\n")] = 0;
+                    newPath.successText = MyString(line);
+
+                    fgets(line, sizeof(line), file);
+                    line[strcspn(line, "\r\n")] = 0;
+                    newPath.failText = MyString(line);
+
+                    kingFinal.paths.push_back(newPath);
+                }
+            }
+            break;
+        }
+    }
+    fclose(file);
+    return true;
 }

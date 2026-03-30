@@ -133,6 +133,8 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SlotAndVector.cpp" />
     <ClCompile Include="StatVector.cpp" />
+    <ClCompile Include="StoryCombo.cpp" />
+    <ClCompile Include="StoryComboManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Enum.h" />
@@ -148,11 +150,16 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="SlotAndVector.h" />
     <ClInclude Include="StatVector.h" />
+    <ClInclude Include="StoryCombo.h" />
+    <ClInclude Include="StoryComboManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Events.txt" />
     <Text Include="Items.txt" />
+    <Text Include="KingFinal.txt" />
     <Text Include="Locations.txt" />
+    <Text Include="Save.txt" />
+    <Text Include="Сombos.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
