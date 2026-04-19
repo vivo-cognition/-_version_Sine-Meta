@@ -1,46 +1,48 @@
 #include "Game.h"
-
-
-void Game::handleLocation() {
-    Location& loc = locManager.allLocations.getAt(currentLocIdx);
-
-    std::cout << "\n=== " << loc.getName().c_str() << " ===" << std::endl;
-    std::cout << loc.getDescription().c_str() << std::endl;
-
-    for (int i = 0; i < loc.paths.getSize(); i++) {
-        std::cout << i + 1 << ". " << loc.paths.getAt(i).actionName.c_str() << std::endl;
-        std::cout << i + 1 << ". " << loc.paths.getAt(i).actionName.c_str() << std::endl;
+#include <iostream>
+#include "MyString.h"
+#include <thread>
+#include <chrono>
+#include <windows.h> 
+Game::Game() {
+    isRunning = true;
+    if (!itemManager.loadItemsFromTXT()) {
+        std::cout << "Ошибка загрузки предметов!" << std::endl;
     }
-    int choice; int count = loc.paths.getSize();
-    while (count > 0) {
-        std::cout << "\nВаш выбор: ";
-        std::cin >> choice;
-        int idx = choice - 1;
-        if (idx >= 0 && idx < loc.paths.getSize()) {
-            Path& selectedPath = loc.paths.getAt(idx);
-
-            if (loc.checkPath(player, idx)) {
-                std::cout << "\n[УСПЕХ]: " << selectedPath.successText.c_str() << std::endl;
-                player.applyStatChange(selectedPath.rewards);
-                currentLocIdx++;
-                break;
-            }
-            else {
-                std::cout << "\n[ПРОВАЛ]: " << selectedPath.failText.c_str() << std::endl;
-                std::cout << "\nПопробуйте снова" << std::endl;
-            }
-        }
+    if (!charManager.loadPlayersFromTXT(itemManager)) {
+        std::cout << "Ошибка загрузки персонажей!" << std::endl;
     }
-    std::cout << "\nУ вас не получилось приблизиться к цели это конец" << std::endl;
-    
+    if (!locManager.loadEventsFromTxt()) {
+        std::cout << "Ошибка загрузки событий"<<std::endl;
+    }
+    if (!locManager.loadLocationsFromTxt()) {
+        std::cout << "Ошибка загрузки локаций" << std::endl;
+    } 
+    if (!locManager.loadMissionsFromTxt()) {
+        std::cout << "Ошибка загрузки финала" << std::endl;
+    }
+    if (!shopManager.loadShopmansFromTxt()) {
+        std::cout << "Ошибка загрузки артов торговцев" << std::endl;
+    }
+    if (!shopManager.loadDialogsFromTxt()) {
+        std::cout << "Ошибка загрузки диалогов" << std::endl;
+    }
+    if (!comboManager.loadCombosFromTxt()) {
+        std::cout << "Ошибка загрузки комбо" << std::endl;
+    }
+    run();
 }
-
 void Game::run() {
-    while (isRunning && currentLocIdx < locManager.allLocations.getSize()) {
-        handleLocation();
-        if (currentLocIdx >= locManager.allLocations.getSize()) {
-            std::cout << "Поздравляем! Вы прошли все испытания!" << std::endl;
-            isRunning = false;
-        }
-    }
+    playIntro();
+    drawingMenu();
+}
+void Game::startNewGame() {
+    logPlayer();
+    drawingMissionAndLocation();
+    drawingShop();
+    inLocation();
+    findItem();
+    eventMeeting();
+    craftBlock();
+    final();
 }

@@ -17,11 +17,16 @@ struct MyString {
     char& operator[](int index);
     const char& operator[](int index) const;
     MyString& operator+=(char c);
+    MyString& operator+=(const char* str);
+    MyString& operator+=(const MyString& other);
+
 
     const char* c_str() const;
     int size() const;
     bool empty() const;
     void clear();
+    void replace(char first, char second);
+
 
     friend std::ostream& operator<<(std::ostream& os, const MyString& str);
 };

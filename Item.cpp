@@ -2,9 +2,9 @@
 
 Item::Item(const MyString& n, const MyString& desc,
     SlotType type, const StatVector& initialStats,
-    bool found)
+    bool found, const MyString& loc)
     : name(n), description(desc), slotType(type), stats(initialStats),
-    isFoundItem(found) {
+    isFoundItem(found), locationType(loc) {
 }
 
 MyString Item::getName() const { return name; }

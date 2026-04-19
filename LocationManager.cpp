@@ -5,11 +5,11 @@
 #include <cstdlib>
 #include <cstring>
 
-LocationManager::LocationManager(const MyString& locPath, const MyString& eventPath, const MyString& kinFinal)
-    : locationsFilePath(locPath), eventsFilePath(eventPath), kingFilePath(kinFinal) {
+LocationManager::LocationManager(const MyString& locPath, const MyString& eventPath, const MyString& misFinal)
+    : locationsFilePath(locPath), eventsFilePath(eventPath), missionFilePath(misFinal) {
     loadLocationsFromTxt();
     loadEventsFromTxt();
-    loadKingFinalFromTxt();
+    loadMissionsFromTxt();
 }
 
 bool LocationManager::loadLocationsFromTxt() {
@@ -91,13 +91,13 @@ void LocationManager::printAllLocations() const {
     std::cout << "\n=== ÑÏÈÑÎÊ ÄÎÑÒÓÏÍÛÕ ËÎÊÀÖÈÉ ===" << std::endl;
 
     for (int i = 0; i < allLocations.getSize(); i++) {
-        const Location& loc = allLocations.getAt(i);
+        const Location& loc = allLocations[i];
 
         std::cout << "\n[" << i + 1 << "] Ëîêàöèÿ: " << loc.name.c_str() << std::endl;
         std::cout << "    " << loc.description.c_str() << std::endl;
 
         for (int j = 0; j < loc.paths.getSize(); j++) {
-            const Path& path = loc.paths.getAt(j);
+            const Path& path = loc.paths[j];
             std::cout << "\n    Ïóòü ¹" << j + 1 << ": " << path.actionName.c_str();
             if (path.rewards.size > 0) {
                 std::cout << "\n    Íàãðàäà: ";
@@ -124,15 +124,6 @@ void LocationManager::printAllLocations() const {
     std::cout << "\n================================" << std::endl;
 }
 
-Location LocationManager::getRandomLocation() {
-    int count = allLocations.getSize();
-    if (count <= 0) {
-        return Location();
-    }
-    int randomIdx = rand() % count;
-    Location baseLocation = allLocations.getAt(randomIdx);
-    return baseLocation;
-}
 bool LocationManager::loadEventsFromTxt() {
     eventPool.clear();
     FILE* file = fopen(eventsFilePath.c_str(), "r");
@@ -193,35 +184,53 @@ bool LocationManager::loadEventsFromTxt() {
 Location LocationManager::getRandomEventByType(const MyString& type) {
     MyVector<Location> filteredEvents;
     for (int i = 0; i < eventPool.getSize(); i++) {
-        const Location& ev = eventPool.getAt(i);
+        const Location& ev = eventPool[i];
         if (ev.name == type || ev.name == MyString("GLOBAL")) {
             filteredEvents.push_back(ev);
         }
     }
     if (filteredEvents.getSize() == 0) return Location();
     int randomIdx = rand() % filteredEvents.getSize();
-    return filteredEvents.getAt(randomIdx);
+    return filteredEvents[randomIdx];
 }
-bool LocationManager::loadKingFinalFromTxt() {
-    FILE* file = fopen(kingFilePath.c_str(), "r");
+
+bool LocationManager::loadMissionsFromTxt() {
+    missionsPool.clear();
+    FILE* file = fopen(missionFilePath.c_str(), "r");
     if (!file) return false;
 
     char line[1024];
     while (fgets(line, sizeof(line), file)) {
-        char locName[64];
-        if (sscanf(line, "%s {", locName) == 1) {
-            kingFinal.name = MyString(locName);
+        char mName[64];
+        if (sscanf(line, "%s {", mName) == 1) {
+            Mission newMission;
+            newMission.name = MyString(mName);
+            newMission.name.replace('_', ' ');
+
             if (fgets(line, sizeof(line), file)) {
                 line[strcspn(line, "\r\n")] = 0;
-                kingFinal.description = MyString(line);
+                newMission.targetLocation = MyString(line);
             }
+
+            if (fgets(line, sizeof(line), file)) {
+                line[strcspn(line, "\r\n")] = 0;
+                newMission.description = MyString(line);
+            }
+
+            if (fgets(line, sizeof(line), file)) {
+                line[strcspn(line, "\r\n")] = 0;
+                newMission.secondDescription = MyString(line);
+            }
+
             if (fgets(line, sizeof(line), file)) {
                 int pathsCount = atoi(line);
                 for (int p = 0; p < pathsCount; p++) {
                     Path newPath;
+
                     fgets(line, sizeof(line), file);
                     line[strcspn(line, "\r\n")] = 0;
                     newPath.actionName = MyString(line);
+
                     fgets(line, sizeof(line), file);
                     int reqCount = atoi(line);
                     newPath.requirements = StatVector(reqCount);
@@ -231,15 +240,18 @@ bool LocationManager::loadKingFinalFromTxt() {
                         sscanf(line, "%s %d", sName, &sVal);
                         newPath.requirements.setAt(i, MyString(sName), sVal);
                     }
+
                     fgets(line, sizeof(line), file);
                     int rewardsCount = atoi(line);
                     newPath.rewards = StatVector(rewardsCount);
                     for (int i = 0; i < rewardsCount; i++) {
                         char rName[64]; int rVal;
                         fgets(line, sizeof(line), file);
-                        sscanf(line, "%s %d", rName, &rVal);
-                        newPath.rewards.setAt(i, MyString(rName), rVal);
+                        if (sscanf(line, "%s %d", rName, &rVal) == 2) {
+                            newPath.rewards.setAt(i, MyString(rName), rVal);
+                        }
                     }
+
                     fgets(line, sizeof(line), file);
                     line[strcspn(line, "\r\n")] = 0;
                     newPath.successText = MyString(line);
@@ -248,12 +260,29 @@ bool LocationManager::loadKingFinalFromTxt() {
                     line[strcspn(line, "\r\n")] = 0;
                     newPath.failText = MyString(line);
 
-                    kingFinal.paths.push_back(newPath);
+                    newMission.paths.push_back(newPath);
                 }
-            }
-            break;
+            }                     
+            fgets(line, sizeof(line), file);
+
+            missionsPool.push_back(newMission);
         }
     }
     fclose(file);
     return true;
+}
+
+Mission LocationManager::getRandomMission() {
+    if (missionsPool.getSize() == 0) return Mission();
+    int idx = rand() % missionsPool.getSize();
+    return missionsPool[idx];
+}
+
+Location LocationManager::getLocationByTag(const MyString& tag) {
+    for (int i = 0; i < allLocations.getSize(); i++) {
+        if (allLocations[i].name == tag) {
+            return allLocations[i];
+        }
+    }
+    return Location("Íåèçâåñòíîå ìåñòî", "Çäåñü íè÷åãî íåò.");
 }

@@ -13,12 +13,13 @@ struct ItemManager {
     MyString itemsFilePath;
     ItemManager(const MyString& filePath = "Items.txt");
     bool loadItemsFromTXT();
-    MyVector<Item> getRandomItemChoices(int count, const bool* excludedSlots = nullptr);
-    Item generateRandomFoundItem();
+    MyVector<Item> getRandomItemChoices(int count, ShopType shop);
+    Item generateRandomFoundItem(MyString tag);
     const MyVector<Item>& getItemBySlot(SlotType slot) const;
 
     void printAllItems() const;
     int getTotalItemCount() const;
+    Item* findItemByName(const MyString& name);
 
     bool isLoaded() const;
 };

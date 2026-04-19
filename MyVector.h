@@ -45,7 +45,13 @@ struct MyVector {
         data[size] = newItem;
         size++;
     }
-    T& getAt(int index) const {
+    T& operator[](int index) {
+        if (index >= 0 && index < size) {
+            return data[index];
+        }
+        return data[0];
+    }
+    const T& operator[] (int index) const {
         if (index >= 0 && index < size) {
             return data[index];
         }

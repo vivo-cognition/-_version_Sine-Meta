@@ -79,6 +79,20 @@ MyString& MyString::operator+=(char c) {
     length = newLength;
     return *this;
 }
+MyString& MyString::operator+=(const char* str) {
+    if (str) {
+        for (int i = 0; str[i] != '\0'; ++i) {
+            *this += str[i];
+        }
+    }
+    return *this;
+}
+MyString& MyString::operator+=(const MyString& other) {
+    for (int i = 0; i < other.length; i++) {
+        *this += other[i];
+    }
+    return *this;
+}
 
 const char* MyString::c_str() const {
     return data;
@@ -101,4 +115,12 @@ void MyString::clear() {
 std::ostream& operator<<(std::ostream& os, const MyString& str) {
     os << str.data;
     return os;
+}
+
+void MyString::replace(char first, char second) {
+    for (int i = 0; i < length; i++) {
+        if (data[i] == '_') {
+            data[i] = ' ';
+        }
+    }
 }

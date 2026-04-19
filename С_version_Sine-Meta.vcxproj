@@ -123,20 +123,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CharacterManager.cpp" />
+    <ClCompile Include="Drawing.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="ItemManager.cpp" />
     <ClCompile Include="Location.cpp" />
     <ClCompile Include="LocationManager.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mission.cpp" />
     <ClCompile Include="MyString.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Shopman.cpp" />
+    <ClCompile Include="ShopmanManager.cpp" />
     <ClCompile Include="SlotAndVector.cpp" />
     <ClCompile Include="StatVector.cpp" />
     <ClCompile Include="StoryCombo.cpp" />
     <ClCompile Include="StoryComboManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CharacterManager.h" />
     <ClInclude Include="Enum.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Item.h" />
@@ -148,18 +154,24 @@
     <ClInclude Include="MyVector.h" />
     <ClInclude Include="Path.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Shopman.h" />
+    <ClInclude Include="ShopmanManager.h" />
     <ClInclude Include="SlotAndVector.h" />
     <ClInclude Include="StatVector.h" />
     <ClInclude Include="StoryCombo.h" />
     <ClInclude Include="StoryComboManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="ArtShopman.txt" />
+    <Text Include="Combos.txt" />
     <Text Include="Events.txt" />
+    <Text Include="History.txt" />
+    <Text Include="StartPlayers.txt" />
     <Text Include="Items.txt" />
-    <Text Include="KingFinal.txt" />
+    <Text Include="Mission.txt" />
     <Text Include="Locations.txt" />
     <Text Include="Save.txt" />
-    <Text Include="Сombos.txt" />
+    <Text Include="ShopDialogues.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

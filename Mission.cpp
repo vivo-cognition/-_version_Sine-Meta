@@ -1,10 +1,10 @@
-#include "Location.h"
+#include "Mission.h"
 
-Location::Location(const MyString& n, const MyString& desc)
-    : name(n), description(desc) {
+Mission::Mission(const MyString& n, const MyString& desc, const MyString& sdesc)
+    : name(n), description(desc), secondDescription(sdesc) {
 }
 
-bool Location::checkPath(const Player& player, int pathIdx) {
+bool Mission::checkPath(const Player& player, int pathIdx) {
     if (pathIdx < 0 || pathIdx >= paths.getSize()) {
         return false;
     }
@@ -18,20 +18,20 @@ bool Location::checkPath(const Player& player, int pathIdx) {
     return true;
 }
 
-MyString Location::getName() const {
+MyString Mission::getName() const {
     return name;
 }
-MyString Location::getDescription() const {
+MyString Mission::getDescription() const {
     return description;
 }
-MyVector <MyString> Location::getAllNamePath() {
+MyVector <MyString> Mission::getAllNamePath() {
     MyVector <MyString> NamePaths;
     for (int i = 0; i < paths.getSize();i++) {
         NamePaths.push_back(paths[i].actionName);
     }
     return NamePaths;
 }
-MyString Location::FailOrWin(Player player, int selected) {
+MyString Mission::FailOrWin(Player player, int selected) {
     const Path& p = paths[selected];
     for (int i = 0; i < p.requirements.size; i++) {
         StatPair req = p.requirements.getAt(i);

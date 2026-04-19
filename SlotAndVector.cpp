@@ -4,5 +4,5 @@ SlotAndVector::SlotAndVector() : slot(SlotType::NONE) {}
 
 SlotAndVector::~SlotAndVector() {}
 Item& SlotAndVector::operator[](int index) {
-    return items.getAt(index);
+    return items[index];
 }

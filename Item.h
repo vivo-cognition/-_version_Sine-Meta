@@ -6,6 +6,7 @@
 struct Item {
 	MyString name;
 	MyString description;
+	MyString locationType;
 	SlotType slotType;
 	StatVector stats;
 	bool isFoundItem;
@@ -14,7 +15,8 @@ struct Item {
 		const MyString& desc = "Пустой слот",
 		SlotType type = SlotType::NONE,
 		const StatVector& initialStats = StatVector(0),
-		bool found = false);
+		bool found = false,
+		const MyString& loc = "Globale");
 
 	MyString getName() const;
 	MyString getDescription() const;

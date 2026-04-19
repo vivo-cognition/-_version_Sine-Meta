@@ -14,6 +14,8 @@ struct Location {
     Location(const MyString& n = "Пусто", const MyString& desc = "Нет описания");
     MyString getName() const;
     MyString getDescription() const;
+    MyVector <MyString> getAllNamePath();
+    MyString FailOrWin(Player player, int selected);
 
     bool checkPath(const Player& player, int pathIdx);
 };
